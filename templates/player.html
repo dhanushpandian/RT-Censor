@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Smart Player</title>
+</head>
+<body>
+  <h2>Smart Skipping Player</h2>
+  <video id="video" width="720" controls>
+    <source src="/media/videos/{{ filename }}" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+  <script>
+    const video = document.getElementById('video');
+    const filename = "{{ filename }}";
+    let skipMarkers = [];
+  
+    fetch(`/markers/${filename}`)
+      .then(res => res.json())
+      .then(data => {
+        skipMarkers = data;
+  
+        video.addEventListener('timeupdate', () => {
+          // Check if the current time is within any skip segment
+          for (const { start, end } of skipMarkers) {
+            if (video.currentTime >= start && video.currentTime < end) {
+              // If we're in the skip range, jump to the end of the segment
+              video.currentTime = end;
+              break;
+            }
+          }
+        });
+      });
+  </script>
+  
+  
+
+</body>
+</html>

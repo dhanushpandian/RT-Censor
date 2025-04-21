@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Video List</title>
+</head>
+<body>
+    <h2>Uploaded Videos</h2>
+    <ul>
+        {% for video in videos %}
+            <li><a href="/play/{{ video }}">{{ video }}</a></li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

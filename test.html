@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Video Marker Skipper</title>
+  <style>
+    body { font-family: Arial; text-align: center; margin-top: 50px; }
+    video { width: 80%; max-width: 720px; }
+  </style>
+</head>
+<body>
+  <h1>Video Marker Skipper</h1>
+  <video id="video" controls>
+    <!-- <source src="C:\Users\91638\Videos\Screen Recordings\Screen Recording 2025-04-21 222454.mp4" type="video/mp4"> -->
+    <source src="media/videos/Screen Recording 2025-04-21 222454.mp4" type="video/mp4">
+
+    Your browser does not support the video tag.
+  </video>
+
+  <script>
+    const video = document.getElementById('video');
+
+    // Define your markers (in seconds)
+    const markers = [0,5,7,10]; // Play 5–10, skip 10–20, play 20–25, skip 25–35, play 35–40
+
+    let segmentIndex = 0;
+
+    video.addEventListener('timeupdate', () => {
+      // If we're at the end of current play segment, skip to next play segment
+      if (segmentIndex < markers.length - 1 && video.currentTime >= markers[segmentIndex + 1]) {
+        segmentIndex += 2;
+        if (segmentIndex < markers.length) {
+          video.currentTime = markers[segmentIndex]; // Jump to next "play" start
+        } else {
+          video.pause(); // No more markers left
+        }
+      }
+    });
+
+    video.addEventListener('loadedmetadata', () => {
+      // Start video at first marker
+      video.currentTime = markers[0];
+    });
+  </script>
+</body>
+</html>

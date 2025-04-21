@@ -1,0 +1,10 @@
+<html>
+    <body>
+        <h2>Upload a Video</h2>
+        <form action="/admin/upload" enctype="multipart/form-data" method="post">
+            <input name="title" type="text" placeholder="Video Title" required>
+            <input name="file" type="file" accept="video/*" required>
+            <button type="submit">Upload</button>
+        </form>
+    </body>
+</html>
