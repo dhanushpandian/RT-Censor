@@ -1,8 +1,11 @@
+import os
+import shutil
+import json
 from fastapi import FastAPI, File, UploadFile, Form, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-import os, shutil, json
+from ai import analyze_video_for_explicit_content  # Import the analysis function
 
 app = FastAPI()
 
@@ -25,24 +28,27 @@ else:
 
 @app.get("/admin", response_class=HTMLResponse)
 async def upload_form(request: Request):
-    return templates.TemplateResponse("uploadform.html",{"request": request})
-
+    return templates.TemplateResponse("uploadform.html", {"request": request})
 
 @app.post("/admin/upload")
 async def upload_video(title: str = Form(...), file: UploadFile = File(...)):
     file_location = os.path.join(MEDIA_DIR, file.filename)
+    
+    # Save the uploaded file
     with open(file_location, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
-    # Dummy skip marker generator
-    skip_times = [{"start": 3, "end": 6}]  # Example markers
+    # Get NSFW timestamps for the uploaded video
+    skip_times = analyze_video_for_explicit_content(file_location)
+
+    # Save skip timestamps to markers dictionary
     markers[file.filename] = skip_times
 
-    # Save to markers.json
+    # Save markers to a JSON file
     with open(MARKER_FILE, "w") as f:
-        json.dump(markers, f)   
+        json.dump(markers, f)
 
-    return {"message": "Uploaded successfully", "filename": file.filename, "markers": skip_times}
+    return {"message": "Video uploaded successfully", "filename": file.filename, "markers": skip_times}
 
 @app.get("/markers/{filename}")
 async def get_markers(filename: str):
